@@ -11,10 +11,11 @@ class myClient(discord.Client):
     # default_channel = myClient.get_channel(1057350032975745085)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.default = 1057350032975745085
-        self.ownerSever = 789867488183058503
-        self.Colder = 382562385816453142
-        self.get_role_message = 1063781016449318973
+        self.default = os.getenv('DEFAULT')
+        self.ownerSever = os.getenv('OWNER')
+        self.Colder = os.getenv('COLDER')
+        self.get_role_message = os.getenv('ROLEMESS')
+        print(self.default, self.ownerSever, self.Colder, self.get_role_message)
         self.react_to_role = {
             discord.PartialEmoji(name ='0️⃣'): 'Khác',
             discord.PartialEmoji(name='1️⃣'): '2k1',
@@ -25,7 +26,6 @@ class myClient(discord.Client):
         print('ok')
     async def on_ready(self):
         print('We have logged in as {0.user}'.format(self))
-        print('We have logged in as {0.user}'.format(client))
 
     async def on_message(self, message: discord.Message):
         print(*message.mentions)
