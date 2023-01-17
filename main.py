@@ -6,16 +6,17 @@ token = os.getenv('TOKEN')
 print(token)
 intents = discord.Intents.all()
 intents.message_content = True
-is_set_role = []
+#luu du lieu kieu nha que :)) xin loi rat nhieu
+is_set_role = {}
 class myClient(discord.Client):
     # default_channel = myClient.get_channel(1057350032975745085)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.default = os.getenv('DEFAULT')
-        self.ownerSever = os.getenv('OWNER')
-        self.Colder = os.getenv('COLDER')
-        self.get_role_message = os.getenv('ROLEMESS')
-        print(self.default, self.ownerSever, self.Colder, self.get_role_message)
+        self.default = int(os.getenv('DEFAULT'))
+        self.ownerSever = int(os.getenv('OWNER'))
+        self.Colder = int(os.getenv('COLDER'))
+        self.get_role_message = int(os.getenv('ROLEMESS'))
+        print(self.default, self.ownerSever, self.Colder, self.get_role_message, type(self.default))
         self.react_to_role = {
             discord.PartialEmoji(name ='0️⃣'): 'Khác',
             discord.PartialEmoji(name='1️⃣'): '2k1',
@@ -47,14 +48,23 @@ class myClient(discord.Client):
         mem = payload.member
         #find the guild the message belongs to
         guild = self.get_guild(payload.guild_id)
+        channel = self.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        id = guild.id
+        if id not in is_set_role:
+            is_set_role[id] = set()
         try:
             role = self.react_to_role[payload.emoji]
         except:
             return
         print(role)
         if role != None:
+            if mem in is_set_role[id]:
+                await message.remove_reaction(payload.emoji, mem)
+                return
             await mem.add_roles(discord.utils.get(guild.roles, name = role))
-    async def on_raw_reaction_remove(payload):
+            is_set_role[id].add(mem)
+    async def on_raw_reaction_remove(self, payload):
         pass
     async def on_member_join(self, mem):
         default_channel = self.get_channel(self.default)
