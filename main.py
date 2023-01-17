@@ -1,0 +1,68 @@
+import discord
+import os
+from dotenv import load_dotenv
+load_dotenv()
+token = os.getenv('TOKEN')
+print(token)
+intents = discord.Intents.all()
+intents.message_content = True
+is_set_role = []
+class myClient(discord.Client):
+    # default_channel = myClient.get_channel(1057350032975745085)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.default = 1057350032975745085
+        self.ownerSever = 789867488183058503
+        self.Colder = 382562385816453142
+        self.get_role_message = 1063781016449318973
+        self.react_to_role = {
+            discord.PartialEmoji(name ='0️⃣'): 'Khác',
+            discord.PartialEmoji(name='1️⃣'): '2k1',
+            discord.PartialEmoji(name='2️⃣'): '2k2',
+            discord.PartialEmoji(name='3️⃣'): '2k3',
+            discord.PartialEmoji(name='4️⃣'): '2k4'
+        }
+        print('ok')
+    async def on_ready(self):
+        print('We have logged in as {0.user}'.format(self))
+        print('We have logged in as {0.user}'.format(client))
+
+    async def on_message(self, message: discord.Message):
+        print(*message.mentions)
+        #if bot don't do anything
+        if message.author == self.user: return
+        #add_reaction:
+        emoji = discord.utils.get(message.guild.emojis, name = 'khoc')
+        await message.add_reaction(emoji)
+        #if start with command
+        if message.content.startswith('#hello'):
+            await message.reply('Lo con cac')
+        #if tag anyone
+        for user in self.users:
+            if user.mentioned_in(message):
+                await message.reply(f'Uhm doi ti {user.name} dang vao')
+    
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        if payload.message_id != self.get_role_message: return
+        mem = payload.member
+        #find the guild the message belongs to
+        guild = self.get_guild(payload.guild_id)
+        try:
+            role = self.react_to_role[payload.emoji]
+        except:
+            return
+        print(role)
+        if role != None:
+            await mem.add_roles(discord.utils.get(guild.roles, name = role))
+    async def on_raw_reaction_remove(payload):
+        pass
+    async def on_member_join(self, mem):
+        default_channel = self.get_channel(self.default)
+        await default_channel.send(f'Chao mung {mem} den voi ao lang, nho chon role o kenh role')
+
+    async def on_member_remove(self, mem):
+        default_channel = self.get_channel(self.default)
+        await default_channel.send(f'Khong tien ban {mem}, cut')   
+
+client = myClient(intents = intents)
+client.run(token)
