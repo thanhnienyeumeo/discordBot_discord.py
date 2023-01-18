@@ -1,8 +1,9 @@
 import discord
 import os
 from dotenv import load_dotenv
+from keep_alive import keep_alive
 load_dotenv()
-token = os.getenv('TOKEN')
+token = os.environ['TOKEN']
 print(token)
 intents = discord.Intents.all()
 intents.message_content = True
@@ -12,11 +13,10 @@ class myClient(discord.Client):
     # default_channel = myClient.get_channel(1057350032975745085)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.default = int(os.getenv('DEFAULT'))
-        self.ownerSever = int(os.getenv('OWNER'))
-        self.Colder = int(os.getenv('COLDER'))
-        self.get_role_message = int(os.getenv('ROLEMESS'))
-        print(self.default, self.ownerSever, self.Colder, self.get_role_message, type(self.default))
+        self.default = int(os.environ['DEFAULT'])
+        self.ownerSever = int(os.environ['OWNER'])
+        self.Colder = int(os.environ['COLDER'])
+        self.get_role_message = int(os.environ['ROLEMESS'])
         self.react_to_role = {
             discord.PartialEmoji(name ='0️⃣'): 'Khác',
             discord.PartialEmoji(name='1️⃣'): '2k1',
@@ -30,18 +30,21 @@ class myClient(discord.Client):
 
     async def on_message(self, message: discord.Message):
         print(*message.mentions)
-        #if bot don't do anything
+        #if bot chat don't do anything
         if message.author == self.user: return
         #add_reaction:
-        emoji = discord.utils.get(message.guild.emojis, name = 'khoc')
-        await message.add_reaction(emoji)
+        try:
+            emoji = discord.utils.get(message.guild.emojis, name = 'khoc')
+            await message.add_reaction(emoji)
+        except: 
+            pass
         #if start with command
-        if message.content.startswith('#hello'):
+        if message.content.startswith('hello'):
             await message.reply('Lo con cac')
         #if tag anyone
-        for user in self.users:
-            if user.mentioned_in(message):
-                await message.reply(f'Uhm doi ti {user.name} dang vao')
+        # for user in self.users:
+        #     if user.mentioned_in(message):
+        #         await message.reply(f'Uhm doi ti {user.name} dang vao')
     
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         if payload.message_id != self.get_role_message: return
